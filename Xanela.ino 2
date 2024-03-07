@@ -1,0 +1,89 @@
+/*Programa para controlar o funcionamento simplificado dunha xanela dun coche.
+*Un pulsador(encargase de tuas tareas a)un paso por paro antes de invertir o 
+*o sentido do movemento do vidrio,b)engadir dous pulsadores mais que imitan dous
+*fins de carrera.
+*O pulsador o premer umha vez fai que o vidrio se mova segun o estado no que 
+* quedou na vez anterior.
+*O premer novamente ten que parar . Ao volver a pulsar debe invertir o movemento.
+* O vidro ten que parar ao premer un fin de carreira.
+*Un fin de carreira que ao premer pecha,ou abre según sexa.
+*(a) ao premer unha vez, actívase o motor (relé) que corresponde co estado actual 
+*do sistema.
+*(b)o motor permanece activo até que o fin de carreira.
+*(c) en calquera momento intermedio,o pulsador da xanela pode parar.
+*O motor permanezca activo a ta que o fin de carreira detecte a chegada do vidrio.
+*O pulsador da xanela pode parar o vidro nunha soa vez ou invertir o movemento,
+*En calquera momento.
+*Dous relés(activación dos motores)
+
+*Autora:Dolores
+*Data:28/2/2024
+*/
+//Definición de entradas e saídas
+#define PULSADOR10  10
+#define TOPE_ARRIBA  11
+#define TOPE_ABAIXO  12
+#define pinMotor13  13
+#define pinMotor9  9
+
+int tempoTotal = 7000;
+bool inversion = false;
+int tempoEncendido= 0;
+int tempoEspera = 10;
+
+void setup()
+{
+pinMode(PULSADOR10, INPUT);
+pinMode(TOPE_ARRIBA,INPUT);
+pinMode(TOPE_ABAIXO, INPUT);
+pinMode(pinMotor13, OUTPUT);
+pinMode(pinMotor9, OUTPUT);
+  Serial.begin(9600);
+  
+}
+
+void loop()
+{
+  if(digitalRead(PULSADOR10)== HIGH)
+                              
+  {
+    if (tempoEncendido > 0)
+    {
+      tempoEncendido = 0;
+    }
+    else {
+    	inversion = !inversion;
+    	tempoEncendido = tempoTotal;
+    }
+    while (digitalRead(PULSADOR10) == HIGH)
+    {
+      delay(tempoEspera);
+    }
+  }
+  
+  if (digitalRead(TOPE_ARRIBA) && !inversion)
+  {
+    tempoEncendido = 0;
+  }
+  
+  if (digitalRead(TOPE_ABAIXO) && inversion)
+  {
+    tempoEncendido = 0;
+  }
+  
+  if (tempoEncendido > 0)
+  {
+    tempoEncendido = tempoEncendido - tempoEspera;
+    if (inversion)
+    	digitalWrite(pinMotor13, HIGH);
+    else
+    	digitalWrite(pinMotor9, !inversion);
+  }
+else
+{
+  digitalWrite(pinMotor13, LOW);
+  digitalWrite(pinMotor9, LOW);
+}
+delay(tempoEspera);
+}
+  
